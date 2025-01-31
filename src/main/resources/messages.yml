@@ -1,0 +1,13 @@
+# PvPUP Messages Configuration
+
+# Level messages
+level-up: "&a➜ ¡Has alcanzado el nivel %level%!"
+level-down: "&c➜ ¡Has bajado al nivel %level%!"
+level-set: "&e➜ Tu nivel ha sido establecido a %level%!"
+
+# Combat messages
+kill-message: "&e%killer% &7ha derrotado a &e%victim%!"
+water-death-message: "&e%player% &7murió por tocar el agua!"
+
+# General messages
+join-message: "&7¡Bienvenido a &6PvP UP&7!"

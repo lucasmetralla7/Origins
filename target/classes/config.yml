@@ -1,0 +1,50 @@
+# PvPUP Configuration
+
+# Maximum level players can reach
+max-level: 20
+
+# Database Configuration
+database:
+  # Type can be 'sqlite' or 'mysql'
+  type: sqlite
+
+  # MySQL settings (only used if type is 'mysql')
+  mysql:
+    host: localhost
+    port: 3306
+    database: pvpup
+    username: root
+    password: ''
+
+  # SQLite settings (only used if type is 'sqlite')
+  sqlite:
+    file: players.db
+
+# Level configuration
+levels:
+  1:
+    items:
+      - "WOODEN_SWORD"
+  5:
+    items:
+      - "STONE_SWORD"
+      - "LEATHER_CHESTPLATE"
+  10:
+    items:
+      - "IRON_SWORD"
+      - "IRON_CHESTPLATE"
+  15:
+    items:
+      - "DIAMOND_SWORD"
+      - "IRON_ARMOR"
+  20:
+    items:
+      - "DIAMOND_SWORD"
+      - "DIAMOND_ARMOR"
+      - "GOLDEN_APPLE:3"
+
+# Experience multiplier for boosters
+boosters:
+  default: 1.0
+  vip: 1.5
+  mvp: 2.0

@@ -1,0 +1,14 @@
+name: PvPUP
+version: 1.0.0
+main: com.pvpup.PvPUP
+api-version: 1.13
+description: A PvP game mode with unique level mechanics
+commands:
+  pvpup:
+    description: PvPUP admin commands
+    usage: /<command> <setlevel|level> <player> [level]
+    permission: pvpup.admin
+permissions:
+  pvpup.admin:
+    description: Allows access to PvPUP admin commands
+    default: op

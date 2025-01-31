@@ -1,0 +1,6 @@
+com/pvpup/managers/LevelManager.class
+com/pvpup/PvPUP.class
+com/pvpup/models/PlayerData.class
+com/pvpup/managers/ScoreboardManager.class
+com/pvpup/managers/DatabaseManager.class
+com/pvpup/listeners/CombatListener.class
