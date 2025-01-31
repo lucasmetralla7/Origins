@@ -3,4 +3,6 @@
 /home/runner/workspace/src/main/java/com/pvpup/managers/LevelManager.java
 /home/runner/workspace/src/main/java/com/pvpup/models/PlayerData.java
 /home/runner/workspace/src/main/java/com/pvpup/managers/ScoreboardManager.java
+/home/runner/workspace/src/main/java/com/pvpup/managers/SafeZoneManager.java
 /home/runner/workspace/src/main/java/com/pvpup/managers/DatabaseManager.java
+/home/runner/workspace/src/main/java/com/pvpup/managers/ArenaManager.java

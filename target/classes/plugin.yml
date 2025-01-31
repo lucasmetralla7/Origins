@@ -6,7 +6,7 @@ description: A PvP game mode with unique level mechanics
 commands:
   pvpup:
     description: PvPUP admin commands
-    usage: /<command> <setlevel|level> <player> [level]
+    usage: /<command> <setlevel|level|pos1|pos2|arena> [args]
     permission: pvpup.admin
 permissions:
   pvpup.admin:

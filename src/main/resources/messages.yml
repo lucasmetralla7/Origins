@@ -9,5 +9,9 @@ level-set: "&e➜ Tu nivel ha sido establecido a %level%!"
 kill-message: "&e%killer% &7ha derrotado a &e%victim%!"
 water-death-message: "&e%player% &7murió por tocar el agua!"
 
+# Booster messages
+booster-activated: "&a➜ ¡Booster de experiencia x%multiplier% activado!"
+booster-expired: "&c➜ Tu booster de experiencia ha expirado."
+
 # General messages
 join-message: "&7¡Bienvenido a &6PvP UP&7!"

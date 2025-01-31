@@ -20,27 +20,60 @@ database:
   sqlite:
     file: players.db
 
+# Death effects configuration
+death-effects:
+  water-death:
+    # Visual effects
+    particles:
+      enabled: true
+      type: WATER_SPLASH
+      count: 50
+      radius: 1
+    # Sound effects
+    sound:
+      enabled: true
+      type: ENTITY_PLAYER_SPLASH
+      volume: 1.0
+      pitch: 1.0
+
+# Combat configuration
+combat:
+  # Time in seconds between deaths
+  death-cooldown: 5
+  # Message shown when trying to attack during cooldown
+  cooldown-message: "&cDebes esperar %time% segundos antes de volver a combatir."
+
 # Level configuration
 levels:
   1:
     items:
       - "WOODEN_SWORD"
+      - "LEATHER_BOOTS"
   5:
     items:
       - "STONE_SWORD"
       - "LEATHER_CHESTPLATE"
+      - "LEATHER_LEGGINGS"
+      - "LEATHER_BOOTS"
   10:
     items:
       - "IRON_SWORD"
       - "IRON_CHESTPLATE"
+      - "IRON_LEGGINGS"
+      - "IRON_BOOTS"
   15:
     items:
-      - "DIAMOND_SWORD"
-      - "IRON_ARMOR"
+      - "IRON_SWORD"
+      - "IRON_CHESTPLATE"
+      - "IRON_LEGGINGS"
+      - "IRON_BOOTS"
+      - "GOLDEN_APPLE:2"
   20:
     items:
       - "DIAMOND_SWORD"
-      - "DIAMOND_ARMOR"
+      - "DIAMOND_CHESTPLATE"
+      - "DIAMOND_LEGGINGS"
+      - "DIAMOND_BOOTS"
       - "GOLDEN_APPLE:3"
 
 # Experience multiplier for boosters

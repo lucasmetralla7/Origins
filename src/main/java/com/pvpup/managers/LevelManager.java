@@ -15,11 +15,13 @@ import java.util.UUID;
 public class LevelManager {
     private final PvPUP plugin;
     private final Map<UUID, PlayerData> playerData;
+    private final Map<UUID, Double> activeBoosts;
     private final int maxLevel;
 
     public LevelManager(PvPUP plugin) {
         this.plugin = plugin;
         this.playerData = new HashMap<>();
+        this.activeBoosts = new HashMap<>();
         this.maxLevel = plugin.getConfig().getInt("max-level", 20);
     }
 
@@ -27,6 +29,17 @@ public class LevelManager {
         PlayerData data = plugin.getDatabaseManager().loadPlayer(player.getUniqueId());
         playerData.put(player.getUniqueId(), data);
         updatePlayerLevel(player);
+
+        if (player.hasPermission("pvpup.booster.mvp")) {
+            activeBoosts.put(player.getUniqueId(), 
+                plugin.getConfig().getDouble("boosters.mvp", 2.0));
+        } else if (player.hasPermission("pvpup.booster.vip")) {
+            activeBoosts.put(player.getUniqueId(), 
+                plugin.getConfig().getDouble("boosters.vip", 1.5));
+        } else {
+            activeBoosts.put(player.getUniqueId(), 
+                plugin.getConfig().getDouble("boosters.default", 1.0));
+        }
     }
 
     public void unloadPlayer(Player player) {
@@ -34,6 +47,7 @@ public class LevelManager {
         if (data != null) {
             plugin.getDatabaseManager().savePlayer(data);
         }
+        activeBoosts.remove(player.getUniqueId());
     }
 
     public int getPlayerLevel(Player player) {
@@ -44,14 +58,39 @@ public class LevelManager {
     public void addLevel(Player player, int amount) {
         PlayerData data = playerData.get(player.getUniqueId());
         if (data != null) {
-            int newLevel = Math.min(data.getLevel() + amount, maxLevel);
+            double boost = activeBoosts.getOrDefault(player.getUniqueId(), 1.0);
+            int boostedAmount = (int) Math.ceil(amount * boost);
+
+            int newLevel = Math.min(data.getLevel() + boostedAmount, maxLevel);
             data.setLevel(newLevel);
             updatePlayerLevel(player);
-            
+
             String message = plugin.getMessagesConfig().getString("level-up")
                     .replace("%level%", String.valueOf(newLevel));
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
         }
+    }
+
+    public void setBooster(Player player, double multiplier, boolean temporary) {
+        activeBoosts.put(player.getUniqueId(), multiplier);
+
+        String message = plugin.getMessagesConfig().getString("booster-activated")
+                .replace("%multiplier%", String.valueOf(multiplier));
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+
+        if (temporary) {
+            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                removeBooster(player);
+            }, 20L * 60 * 30);
+        }
+    }
+
+    public void removeBooster(Player player) {
+        activeBoosts.put(player.getUniqueId(), 
+            plugin.getConfig().getDouble("boosters.default", 1.0));
+
+        String message = plugin.getMessagesConfig().getString("booster-expired");
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
     }
 
     public void removeLevels(Player player, int amount) {
@@ -60,7 +99,7 @@ public class LevelManager {
             int newLevel = Math.max(1, data.getLevel() - amount);
             data.setLevel(newLevel);
             updatePlayerLevel(player);
-            
+
             String message = plugin.getMessagesConfig().getString("level-down")
                     .replace("%level%", String.valueOf(newLevel));
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
@@ -82,11 +121,9 @@ public class LevelManager {
 
     private void updatePlayerLevel(Player player) {
         int level = getPlayerLevel(player);
-        
-        // Clear inventory
+
         player.getInventory().clear();
-        
-        // Give items for current level
+
         String itemPath = "levels." + level + ".items";
         if (plugin.getConfig().contains(itemPath)) {
             for (String item : plugin.getConfig().getStringList(itemPath)) {
@@ -96,8 +133,7 @@ public class LevelManager {
                 }
             }
         }
-        
-        // Update scoreboard
+
         plugin.getScoreboardManager().updateScoreboard(player);
     }
 
@@ -107,22 +143,41 @@ public class LevelManager {
             Material material = Material.valueOf(parts[0].toUpperCase());
             ItemStack item = new ItemStack(material);
 
-            // If amount is specified
             if (parts.length > 1) {
                 item.setAmount(Integer.parseInt(parts[1]));
             }
 
-            // Si es una armadura, agregar automáticamente
             if (material.name().contains("CHESTPLATE") || 
                 material.name().contains("LEGGINGS") || 
                 material.name().contains("BOOTS") || 
                 material.name().contains("HELMET")) {
-                item.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
+
+                if (material.name().contains("DIAMOND")) {
+                    item.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+                    item.addEnchantment(Enchantment.DURABILITY, 2);
+                } 
+                else if (material.name().contains("IRON")) {
+                    item.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
+                    item.addEnchantment(Enchantment.DURABILITY, 1);
+                }
+                else if (material.name().contains("LEATHER")) {
+                    item.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
+                }
             }
 
-            // Si es una espada, agregar afilado
             if (material.name().contains("SWORD")) {
-                item.addEnchantment(Enchantment.DAMAGE_ALL, 1);
+                if (material.name().contains("DIAMOND")) {
+                    item.addEnchantment(Enchantment.DAMAGE_ALL, 2);
+                    item.addEnchantment(Enchantment.DURABILITY, 2);
+                    item.addEnchantment(Enchantment.FIRE_ASPECT, 1);
+                }
+                else if (material.name().contains("IRON")) {
+                    item.addEnchantment(Enchantment.DAMAGE_ALL, 1);
+                    item.addEnchantment(Enchantment.DURABILITY, 1);
+                }
+                else {
+                    item.addEnchantment(Enchantment.DAMAGE_ALL, 1);
+                }
             }
 
             return item;
