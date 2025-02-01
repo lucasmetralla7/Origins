@@ -245,15 +245,15 @@ killstreaks:
     effects:
       - effect: INCREASE_DAMAGE
         level: 1
-        duration: 300  # 15 seconds
+        duration: 200
   15:
     effects:
       - effect: SPEED
         level: 2
-        duration: 300
+        duration: 200
       - effect: INCREASE_DAMAGE
         level: 1
-        duration: 300
+        duration: 200
       - effect: REGENERATION
         level: 1
         duration: 200
@@ -261,13 +261,13 @@ killstreaks:
     effects:
       - effect: SPEED
         level: 3
-        duration: 400
+        duration: 200
       - effect: INCREASE_DAMAGE
         level: 2
-        duration: 400
+        duration: 200
       - effect: REGENERATION
         level: 2
-        duration: 300
+        duration: 200
       - effect: DAMAGE_RESISTANCE
         level: 1
         duration: 200

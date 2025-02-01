@@ -414,9 +414,11 @@ public class LevelManager {
                 }
             }
 
-            // Notify player
-            player.sendMessage(ChatColor.GOLD + "¡" + streak + " kills seguidas! " + 
-                ChatColor.YELLOW + "¡Has recibido bonificaciones!");
+            // Notify player and broadcast killstreak message
+            String killstreakMessage = plugin.getMessagesConfig().getString("killstreak-message", "&6&l%player% &e¡lleva una racha de &6&l%streak% &ekills!")
+                .replace("%player%", player.getName())
+                .replace("%streak%", String.valueOf(streak));
+            plugin.getServer().broadcastMessage(ChatColor.translateAlternateColorCodes('&', killstreakMessage));
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 2.0f);
         }
     }

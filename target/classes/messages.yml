@@ -8,6 +8,7 @@ level-set: "&e➜ Tu nivel ha sido establecido a %level%!"
 # Combat messages
 kill-message: "&e%killer% &7ha derrotado a &e%victim%!"
 water-death-message: "&e%player% &7murió por tocar el agua!"
+killstreak-message: "&6&l%player% &e¡lleva una racha de &6&l%streak% &ekills!"
 
 # Booster messages
 booster-activated: "&a➜ ¡Booster de experiencia x%multiplier% activado!"
