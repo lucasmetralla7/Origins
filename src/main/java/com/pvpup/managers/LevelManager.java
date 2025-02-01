@@ -12,6 +12,9 @@ import org.bukkit.World;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +25,7 @@ public class LevelManager {
     private final Map<UUID, PlayerData> playerData;
     private final Map<UUID, Double> activeBoosts;
     private final int maxLevel;
+    private final Map<UUID, Integer> killstreaks = new HashMap<>();
 
     public LevelManager(PvPUP plugin) {
         this.plugin = plugin;
@@ -84,30 +88,57 @@ public class LevelManager {
         Location loc = player.getLocation();
         World world = player.getWorld();
 
-        // Efectos de sonido
+        // Efectos de sonido iniciales
         world.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
         world.playSound(loc, Sound.BLOCK_NOTE_BLOCK_CHIME, 1.0f, 2.0f);
+        world.playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, 0.5f, 1.5f);
 
         // Tarea para animar partículas
         new BukkitRunnable() {
-            double phi = 0;
+            double time = 0;
+            double radius = 1.5;
+
             public void run() {
-                phi += Math.PI/8;
-                for (double theta = 0; theta <= 2*Math.PI; theta += Math.PI/8) {
-                    double x = 1.5 * Math.cos(theta) * Math.cos(phi);
-                    double y = 1.5 * Math.sin(phi) + 1;
-                    double z = 1.5 * Math.sin(theta) * Math.cos(phi);
+                time += 0.15;
+
+                // Espiral ascendente
+                for (double phi = 0; phi <= 2; phi += 0.2) {
+                    double x = radius * Math.cos(time + phi * Math.PI);
+                    double y = time * 0.5;
+                    double z = radius * Math.sin(time + phi * Math.PI);
 
                     Location particleLoc = loc.clone().add(x, y, z);
+
+                    // Partículas principales
                     world.spawnParticle(Particle.SPELL_WITCH, particleLoc, 1, 0, 0, 0, 0);
                     world.spawnParticle(Particle.END_ROD, particleLoc, 1, 0, 0, 0, 0);
+
+                    // Partículas secundarias
+                    world.spawnParticle(Particle.DRAGON_BREATH, particleLoc, 2, 0.1, 0.1, 0.1, 0);
                 }
 
-                if (phi > 4*Math.PI) {
+                // Anillo horizontal
+                double ringRadius = radius * 1.5;
+                for (double theta = 0; theta < Math.PI * 2; theta += Math.PI / 8) {
+                    double x = ringRadius * Math.cos(theta);
+                    double z = ringRadius * Math.sin(theta);
+                    Location ringLoc = loc.clone().add(x, time * 0.5, z);
+                    world.spawnParticle(Particle.FLAME, ringLoc, 1, 0, 0, 0, 0);
+                }
+
+                // Efecto de explosión al final
+                if (time >= 4) {
+                    // Explosión final
+                    world.spawnParticle(Particle.EXPLOSION_HUGE, loc.clone().add(0, 2, 0), 1, 0, 0, 0, 0);
+                    world.spawnParticle(Particle.FLASH, loc.clone().add(0, 2, 0), 10, 0.5, 0.5, 0.5, 0.1);
+                    world.spawnParticle(Particle.TOTEM, loc.clone().add(0, 2, 0), 50, 1, 1, 1, 0.5);
+
+                    // Efectos de sonido finales
+                    world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1.0f, 0.7f);
+                    world.playSound(loc, Sound.ENTITY_DRAGON_FIREBALL_EXPLODE, 0.7f, 1.2f);
+
+                    // Cancelar la tarea
                     this.cancel();
-                    // Efecto final
-                    world.spawnParticle(Particle.EXPLOSION_LARGE, loc.clone().add(0, 1, 0), 3, 0.5, 0.5, 0.5, 0);
-                    world.playSound(loc, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1.0f, 1.0f);
                 }
             }
         }.runTaskTimer(plugin, 0L, 1L);
@@ -170,12 +201,36 @@ public class LevelManager {
             for (String item : plugin.getConfig().getStringList(itemPath)) {
                 ItemStack itemStack = parseItem(item, level);
                 if (itemStack != null) {
-                    player.getInventory().addItem(itemStack);
+                    if (isArmor(itemStack.getType())) {
+                        equipArmorItem(player, itemStack);
+                    } else {
+                        player.getInventory().addItem(itemStack);
+                    }
                 }
             }
         }
 
         plugin.getScoreboardManager().updateScoreboard(player);
+    }
+
+    private boolean isArmor(Material material) {
+        return material.name().contains("HELMET") ||
+               material.name().contains("CHESTPLATE") ||
+               material.name().contains("LEGGINGS") ||
+               material.name().contains("BOOTS");
+    }
+
+    private void equipArmorItem(Player player, ItemStack item) {
+        Material material = item.getType();
+        if (material.name().contains("HELMET")) {
+            player.getInventory().setHelmet(item);
+        } else if (material.name().contains("CHESTPLATE")) {
+            player.getInventory().setChestplate(item);
+        } else if (material.name().contains("LEGGINGS")) {
+            player.getInventory().setLeggings(item);
+        } else if (material.name().contains("BOOTS")) {
+            player.getInventory().setBoots(item);
+        }
     }
 
     private ItemStack parseItem(String itemString, int playerLevel) {
@@ -321,6 +376,52 @@ public class LevelManager {
         if (data != null) {
             data.setKills(data.getKills() + 1);
             plugin.getScoreboardManager().updateScoreboard(player);
+
+            // Increment killstreak
+            int currentStreak = killstreaks.getOrDefault(player.getUniqueId(), 0) + 1;
+            killstreaks.put(player.getUniqueId(), currentStreak);
+
+            // Check and apply killstreak rewards
+            applyKillstreakRewards(player, currentStreak);
         }
+    }
+
+    private void applyKillstreakRewards(Player player, int streak) {
+        ConfigurationSection killstreakSection = plugin.getConfig().getConfigurationSection("killstreaks." + streak);
+        if (killstreakSection != null && killstreakSection.contains("effects")) {
+            for (String effectKey : killstreakSection.getConfigurationSection("effects").getKeys(false)) {
+                ConfigurationSection effectSection = killstreakSection.getConfigurationSection("effects." + effectKey);
+
+                try {
+                    PotionEffectType effectType = PotionEffectType.getByName(
+                        effectSection.getString("effect", "SPEED")
+                    );
+                    int level = effectSection.getInt("level", 1) - 1; // Convert to 0-based level
+                    int duration = effectSection.getInt("duration", 200);
+
+                    if (effectType != null) {
+                        player.addPotionEffect(new PotionEffect(
+                            effectType,
+                            duration,
+                            level,
+                            true,
+                            true,
+                            true
+                        ));
+                    }
+                } catch (Exception e) {
+                    plugin.getLogger().warning("Error applying killstreak effect: " + e.getMessage());
+                }
+            }
+
+            // Notify player
+            player.sendMessage(ChatColor.GOLD + "¡" + streak + " kills seguidas! " + 
+                ChatColor.YELLOW + "¡Has recibido bonificaciones!");
+            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 2.0f);
+        }
+    }
+
+    public void resetKillstreak(Player player) {
+        killstreaks.remove(player.getUniqueId());
     }
 }

@@ -1,4 +1,4 @@
-modules = ["java"]
+modules = ["java", "java-17"]
 
 [nix]
 channel = "stable-24_05"
@@ -45,7 +45,8 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "java -jar target/pvpup-1.0-SNAPSHOT.jar"
+args = "java -jar -Xmx1G -Xms1G spigot.jar nogui"
+waitForPort = 25565
 
 [deployment]
 run = ["sh", "-c", "mvn clean package"]

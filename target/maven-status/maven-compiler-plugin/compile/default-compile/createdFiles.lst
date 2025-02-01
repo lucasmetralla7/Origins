@@ -1,4 +1,6 @@
 com/pvpup/managers/LevelManager$1.class
+com/pvpup/managers/DatabaseManager.class
+com/pvpup/listeners/CombatListener.class
 com/pvpup/managers/LevelManager.class
 com/pvpup/managers/ArenaManager.class
 com/pvpup/PvPUP.class
@@ -6,4 +8,3 @@ com/pvpup/managers/ArenaManager$Arena.class
 com/pvpup/models/PlayerData.class
 com/pvpup/managers/ScoreboardManager.class
 com/pvpup/managers/SafeZoneManager.class
-com/pvpup/managers/DatabaseManager.class

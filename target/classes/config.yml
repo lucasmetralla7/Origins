@@ -233,3 +233,41 @@ boosters:
   default: 1.0
   vip: 1.5
   mvp: 2.0
+
+# Killstreak Configuration
+killstreaks:
+  5:
+    effects:
+      - effect: SPEED
+        level: 2
+        duration: 200  # 10 seconds (20 ticks = 1 second)
+  10:
+    effects:
+      - effect: INCREASE_DAMAGE
+        level: 1
+        duration: 300  # 15 seconds
+  15:
+    effects:
+      - effect: SPEED
+        level: 2
+        duration: 300
+      - effect: INCREASE_DAMAGE
+        level: 1
+        duration: 300
+      - effect: REGENERATION
+        level: 1
+        duration: 200
+  20:
+    effects:
+      - effect: SPEED
+        level: 3
+        duration: 400
+      - effect: INCREASE_DAMAGE
+        level: 2
+        duration: 400
+      - effect: REGENERATION
+        level: 2
+        duration: 300
+      - effect: DAMAGE_RESISTANCE
+        level: 1
+        duration: 200

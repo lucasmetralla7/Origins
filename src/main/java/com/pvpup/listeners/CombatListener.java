@@ -15,6 +15,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -52,15 +53,25 @@ public class CombatListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
+
+        // Matar al jugador cuando se desconecta
+        player.setHealth(0);
+
         // Al desconectarse, el nivel se reinicia pero guardamos las kills
+        plugin.getLevelManager().setLevel(player, 1);
         plugin.getLevelManager().unloadPlayer(player);
         deathCooldowns.remove(player.getUniqueId());
+
+        // La próxima vez que entre aparecerá en el spawn (gestionado por onPlayerJoin)
     }
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player victim = event.getEntity();
         Player killer = victim.getKiller();
+
+        // Reset victim's killstreak
+        plugin.getLevelManager().resetKillstreak(victim);
 
         // Handle death by player
         if (killer != null) {
@@ -79,13 +90,13 @@ public class CombatListener implements Listener {
         // Set death cooldown
         deathCooldowns.put(victim.getUniqueId(), System.currentTimeMillis());
 
-        // Teleportar al spawn después de un tick para evitar problemas de sincronización
-        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-            Location spawn = plugin.getSpawnLocation();
-            if (spawn != null) {
+        // Teleportar al spawn inmediatamente después de la muerte
+        Location spawn = plugin.getSpawnLocation();
+        if (spawn != null) {
+            plugin.getServer().getScheduler().runTask(plugin, () -> {
                 victim.teleport(spawn);
-            }
-        }, 1L);
+            });
+        }
     }
 
     @EventHandler
@@ -141,13 +152,13 @@ public class CombatListener implements Listener {
             // Set death cooldown
             deathCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
 
-            // Teleportar al spawn después de un tick
-            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-                Location spawn = plugin.getSpawnLocation();
-                if (spawn != null) {
+            // Teleportar al spawn inmediatamente
+            Location spawn = plugin.getSpawnLocation();
+            if (spawn != null) {
+                plugin.getServer().getScheduler().runTask(plugin, () -> {
                     player.teleport(spawn);
-                }
-            }, 1L);
+                });
+            }
         }
     }
 
