@@ -12,10 +12,10 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.block.Block;
 import org.bukkit.Material;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.Location;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,14 +33,28 @@ public class CombatListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        // Reiniciar nivel y cargar datos
+        plugin.getLevelManager().setLevel(player, 1);
         plugin.getLevelManager().loadPlayer(player);
         plugin.getScoreboardManager().updateScoreboard(player);
+
+        // Teleportar al spawn
+        Location spawn = plugin.getSpawnLocation();
+        if (spawn != null) {
+            player.teleport(spawn);
+        }
+
+        // Mensaje de bienvenida
+        String joinMessage = plugin.getMessagesConfig().getString("join-message", "&7¡Bienvenido a &6PvP UP&7!");
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', joinMessage));
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        plugin.getLevelManager().unloadPlayer(event.getPlayer());
-        deathCooldowns.remove(event.getPlayer().getUniqueId());
+        Player player = event.getPlayer();
+        // Al desconectarse, el nivel se reinicia pero guardamos las kills
+        plugin.getLevelManager().unloadPlayer(player);
+        deathCooldowns.remove(player.getUniqueId());
     }
 
     @EventHandler
@@ -59,11 +73,19 @@ public class CombatListener implements Listener {
             plugin.getServer().broadcastMessage(ChatColor.translateAlternateColorCodes('&', killMessage));
         }
 
-        // Handle victim level loss
-        plugin.getLevelManager().removeLevels(victim, 3);
+        // Reiniciar nivel de la víctima
+        plugin.getLevelManager().setLevel(victim, 1);
 
         // Set death cooldown
         deathCooldowns.put(victim.getUniqueId(), System.currentTimeMillis());
+
+        // Teleportar al spawn después de un tick para evitar problemas de sincronización
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            Location spawn = plugin.getSpawnLocation();
+            if (spawn != null) {
+                victim.teleport(spawn);
+            }
+        }, 1L);
     }
 
     @EventHandler
@@ -113,10 +135,19 @@ public class CombatListener implements Listener {
                     .replace("%player%", player.getName());
             plugin.getServer().broadcastMessage(ChatColor.translateAlternateColorCodes('&', waterDeathMessage));
 
-            plugin.getLevelManager().removeLevels(player, 3);
+            // Reiniciar nivel
+            plugin.getLevelManager().setLevel(player, 1);
 
             // Set death cooldown
             deathCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
+
+            // Teleportar al spawn después de un tick
+            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                Location spawn = plugin.getSpawnLocation();
+                if (spawn != null) {
+                    player.teleport(spawn);
+                }
+            }, 1L);
         }
     }
 

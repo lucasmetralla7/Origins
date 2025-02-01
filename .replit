@@ -15,6 +15,10 @@ author = "agent"
 task = "workflow.run"
 args = "Build Minecraft Plugin"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Minecraft Server"
+
 [[workflows.workflow]]
 name = "Build Minecraft Plugin"
 author = "agent"
@@ -28,6 +32,20 @@ task = "packager.installForAll"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "mvn clean package"
+
+[[workflows.workflow]]
+name = "Minecraft Server"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "java -jar target/pvpup-1.0-SNAPSHOT.jar"
 
 [deployment]
 run = ["sh", "-c", "mvn clean package"]

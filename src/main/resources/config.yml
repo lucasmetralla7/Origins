@@ -1,7 +1,7 @@
 # PvPUP Configuration
 
 # Maximum level players can reach
-max-level: 20
+max-level: 80
 
 # Database Configuration
 database:
@@ -23,13 +23,11 @@ database:
 # Death effects configuration
 death-effects:
   water-death:
-    # Visual effects
     particles:
       enabled: true
       type: WATER_SPLASH
       count: 50
       radius: 1
-    # Sound effects
     sound:
       enabled: true
       type: ENTITY_PLAYER_SPLASH
@@ -38,43 +36,197 @@ death-effects:
 
 # Combat configuration
 combat:
-  # Time in seconds between deaths
   death-cooldown: 5
-  # Message shown when trying to attack during cooldown
-  cooldown-message: "&cDebes esperar %time% segundos antes de volver a combatir."
+  cooldown-message: "&cDebes esperar %time% segundos."
 
 # Level configuration
 levels:
+  # Nivel 1-5: Madera básica
   1:
     items:
       - "WOODEN_SWORD"
+  2:
+    items:
+      - "WOODEN_SWORD"
       - "LEATHER_BOOTS"
+  3:
+    items:
+      - "WOODEN_SWORD"
+      - "LEATHER_BOOTS"
+      - "LEATHER_LEGGINGS"
+  4:
+    items:
+      - "WOODEN_SWORD"
+      - "LEATHER_BOOTS"
+      - "LEATHER_LEGGINGS"
+      - "LEATHER_CHESTPLATE"
   5:
     items:
-      - "STONE_SWORD"
-      - "LEATHER_CHESTPLATE"
-      - "LEATHER_LEGGINGS"
+      - "WOODEN_SWORD"
       - "LEATHER_BOOTS"
-  10:
+      - "LEATHER_LEGGINGS"
+      - "LEATHER_CHESTPLATE"
+      - "LEATHER_HELMET"
+
+  # Nivel 6-10: Piedra y cuero mejorado
+  6:
+    items:
+      - "STONE_SWORD"
+      - "LEATHER_BOOTS"
+      - "LEATHER_LEGGINGS"
+      - "LEATHER_CHESTPLATE"
+      - "LEATHER_HELMET"
+
+  # Nivel 11-20: Hierro gradual
+  11:
     items:
       - "IRON_SWORD"
-      - "IRON_CHESTPLATE"
-      - "IRON_LEGGINGS"
       - "IRON_BOOTS"
+      - "LEATHER_LEGGINGS"
+      - "LEATHER_CHESTPLATE"
+      - "LEATHER_HELMET"
   15:
     items:
       - "IRON_SWORD"
-      - "IRON_CHESTPLATE"
-      - "IRON_LEGGINGS"
       - "IRON_BOOTS"
-      - "GOLDEN_APPLE:2"
+      - "IRON_LEGGINGS"
+      - "IRON_CHESTPLATE"
+      - "LEATHER_HELMET"
+      - "GOLDEN_APPLE:1"
   20:
     items:
+      - "IRON_SWORD"
+      - "IRON_BOOTS"
+      - "IRON_LEGGINGS"
+      - "IRON_CHESTPLATE"
+      - "IRON_HELMET"
+      - "GOLDEN_APPLE:2"
+
+  # Nivel 25-35: Diamante gradual
+  25:
+    items:
       - "DIAMOND_SWORD"
-      - "DIAMOND_CHESTPLATE"
-      - "DIAMOND_LEGGINGS"
+      - "IRON_BOOTS"
+      - "IRON_LEGGINGS"
+      - "IRON_CHESTPLATE"
+      - "IRON_HELMET"
+      - "GOLDEN_APPLE:2"
+  30:
+    items:
+      - "DIAMOND_SWORD"
       - "DIAMOND_BOOTS"
+      - "DIAMOND_LEGGINGS"
+      - "IRON_CHESTPLATE"
+      - "IRON_HELMET"
       - "GOLDEN_APPLE:3"
+  35:
+    items:
+      - "DIAMOND_SWORD"
+      - "DIAMOND_BOOTS"
+      - "DIAMOND_LEGGINGS"
+      - "DIAMOND_CHESTPLATE"
+      - "DIAMOND_HELMET"
+      - "GOLDEN_APPLE:3"
+      - "BOW"
+      - "ARROW:32"
+
+  # Nivel 40-50: Diamante encantado
+  40:
+    items:
+      - "DIAMOND_SWORD"
+      - "DIAMOND_BOOTS"
+      - "DIAMOND_LEGGINGS"
+      - "DIAMOND_CHESTPLATE"
+      - "DIAMOND_HELMET"
+      - "GOLDEN_APPLE:4"
+      - "BOW"
+      - "ARROW:48"
+  45:
+    items:
+      - "DIAMOND_SWORD"
+      - "DIAMOND_BOOTS"
+      - "DIAMOND_LEGGINGS"
+      - "DIAMOND_CHESTPLATE"
+      - "DIAMOND_HELMET"
+      - "GOLDEN_APPLE:5"
+      - "BOW"
+      - "ARROW:64"
+  50:
+    items:
+      - "NETHERITE_SWORD"
+      - "DIAMOND_BOOTS"
+      - "DIAMOND_LEGGINGS"
+      - "DIAMOND_CHESTPLATE"
+      - "DIAMOND_HELMET"
+      - "GOLDEN_APPLE:6"
+      - "BOW"
+      - "ARROW:64"
+
+  # Nivel 55-70: Netherite gradual
+  55:
+    items:
+      - "NETHERITE_SWORD"
+      - "NETHERITE_BOOTS"
+      - "DIAMOND_LEGGINGS"
+      - "DIAMOND_CHESTPLATE"
+      - "DIAMOND_HELMET"
+      - "GOLDEN_APPLE:7"
+      - "BOW"
+      - "ARROW:128"
+  60:
+    items:
+      - "NETHERITE_SWORD"
+      - "NETHERITE_BOOTS"
+      - "NETHERITE_LEGGINGS"
+      - "DIAMOND_CHESTPLATE"
+      - "DIAMOND_HELMET"
+      - "GOLDEN_APPLE:8"
+      - "BOW"
+      - "ARROW:128"
+  65:
+    items:
+      - "NETHERITE_SWORD"
+      - "NETHERITE_BOOTS"
+      - "NETHERITE_LEGGINGS"
+      - "NETHERITE_CHESTPLATE"
+      - "DIAMOND_HELMET"
+      - "GOLDEN_APPLE:9"
+      - "BOW"
+      - "ARROW:128"
+  70:
+    items:
+      - "NETHERITE_SWORD"
+      - "NETHERITE_BOOTS"
+      - "NETHERITE_LEGGINGS"
+      - "NETHERITE_CHESTPLATE"
+      - "NETHERITE_HELMET"
+      - "GOLDEN_APPLE:10"
+      - "BOW"
+      - "ARROW:256"
+
+  # Nivel 75-80: Full Netherite maxed
+  75:
+    items:
+      - "NETHERITE_SWORD"
+      - "NETHERITE_BOOTS"
+      - "NETHERITE_LEGGINGS"
+      - "NETHERITE_CHESTPLATE"
+      - "NETHERITE_HELMET"
+      - "GOLDEN_APPLE:12"
+      - "BOW"
+      - "CROSSBOW"
+      - "ARROW:256"
+  80:
+    items:
+      - "NETHERITE_SWORD"
+      - "NETHERITE_BOOTS"
+      - "NETHERITE_LEGGINGS"
+      - "NETHERITE_CHESTPLATE"
+      - "NETHERITE_HELMET"
+      - "GOLDEN_APPLE:15"
+      - "BOW"
+      - "CROSSBOW"
+      - "ARROW:512"
 
 # Experience multiplier for boosters
 boosters:

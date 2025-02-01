@@ -9,6 +9,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 
 import java.io.File;
 import java.util.Arrays;
@@ -21,29 +22,49 @@ public class PvPUP extends JavaPlugin {
     private SafeZoneManager safeZoneManager;
     private ArenaManager arenaManager;
     private FileConfiguration messagesConfig;
+    private Location spawnLocation;
 
     @Override
     public void onEnable() {
         instance = this;
-        
+
         // Save default configs
         saveDefaultConfig();
         saveResource("messages.yml", false);
-        
+
         // Load messages
         messagesConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "messages.yml"));
-        
+
+        // Load spawn location
+        loadSpawnLocation();
+
         // Initialize managers
         databaseManager = new DatabaseManager(this);
         levelManager = new LevelManager(this);
         scoreboardManager = new ScoreboardManager(this);
         safeZoneManager = new SafeZoneManager(this);
         arenaManager = new ArenaManager(this);
-        
+
         // Register listeners
         getServer().getPluginManager().registerEvents(new CombatListener(this), this);
-        
+
         getLogger().info("PvPUP has been enabled!");
+    }
+
+    private void loadSpawnLocation() {
+        if (getConfig().contains("spawn")) {
+            String worldName = getConfig().getString("spawn.world");
+            if (worldName != null && getServer().getWorld(worldName) != null) {
+                spawnLocation = new Location(
+                    getServer().getWorld(worldName),
+                    getConfig().getDouble("spawn.x"),
+                    getConfig().getDouble("spawn.y"),
+                    getConfig().getDouble("spawn.z"),
+                    (float) getConfig().getDouble("spawn.yaw"),
+                    (float) getConfig().getDouble("spawn.pitch")
+                );
+            }
+        }
     }
 
     @Override
@@ -76,9 +97,14 @@ public class PvPUP extends JavaPlugin {
         }
 
         switch (args[0].toLowerCase()) {
+            case "setspawn":
+                setSpawnLocation(player.getLocation());
+                player.sendMessage(ChatColor.GREEN + "Punto de spawn establecido correctamente.");
+                return true;
+
             case "arena":
                 if (args.length < 2) {
-                    player.sendMessage(ChatColor.RED + "Uso: /pvpup arena <create|delete|list|tp|setspawn> [nombre]");
+                    player.sendMessage(ChatColor.RED + "Uso: /pvpup arena <create|delete|list|tp> [nombre]");
                     return true;
                 }
                 handleArenaCommand(player, Arrays.copyOfRange(args, 1, args.length));
@@ -120,9 +146,9 @@ public class PvPUP extends JavaPlugin {
                 }
                 try {
                     int newLevel = Integer.parseInt(args[2]);
-                    if (newLevel < 1 || newLevel > getConfig().getInt("max-level", 20)) {
+                    if (newLevel < 1 || newLevel > getConfig().getInt("max-level", 80)) {
                         player.sendMessage(ChatColor.RED + "Nivel inválido. Debe estar entre 1 y " + 
-                            getConfig().getInt("max-level", 20));
+                            getConfig().getInt("max-level", 80));
                         return true;
                     }
                     levelManager.setLevel(targetPlayer, newLevel);
@@ -141,7 +167,7 @@ public class PvPUP extends JavaPlugin {
 
     private void handleArenaCommand(Player player, String[] args) {
         if (args.length < 1) {
-            player.sendMessage(ChatColor.RED + "Uso: /pvpup arena <create|delete|list|tp|setspawn> [nombre]");
+            player.sendMessage(ChatColor.RED + "Uso: /pvpup arena <create|delete|list|tp> [nombre]");
             return;
         }
 
@@ -191,6 +217,7 @@ public class PvPUP extends JavaPlugin {
 
     private void showHelp(Player player) {
         player.sendMessage(ChatColor.YELLOW + "Comandos de PvPUP:");
+        player.sendMessage(ChatColor.GRAY + "/pvpup setspawn " + ChatColor.WHITE + "- Establecer punto de spawn");
         player.sendMessage(ChatColor.GRAY + "/pvpup level <jugador> " + ChatColor.WHITE + "- Ver nivel de un jugador");
         player.sendMessage(ChatColor.GRAY + "/pvpup setlevel <jugador> <nivel> " + ChatColor.WHITE + "- Establecer nivel");
         player.sendMessage(ChatColor.GRAY + "/pvpup pos1 " + ChatColor.WHITE + "- Establecer posición 1 de zona segura");
@@ -199,6 +226,21 @@ public class PvPUP extends JavaPlugin {
         player.sendMessage(ChatColor.GRAY + "/pvpup arena delete <nombre> " + ChatColor.WHITE + "- Eliminar una arena");
         player.sendMessage(ChatColor.GRAY + "/pvpup arena list " + ChatColor.WHITE + "- Listar arenas");
         player.sendMessage(ChatColor.GRAY + "/pvpup arena tp <nombre> " + ChatColor.WHITE + "- Ir a una arena");
+    }
+
+    public void setSpawnLocation(Location location) {
+        spawnLocation = location.clone();
+        getConfig().set("spawn.world", location.getWorld().getName());
+        getConfig().set("spawn.x", location.getX());
+        getConfig().set("spawn.y", location.getY());
+        getConfig().set("spawn.z", location.getZ());
+        getConfig().set("spawn.yaw", location.getYaw());
+        getConfig().set("spawn.pitch", location.getPitch());
+        saveConfig();
+    }
+
+    public Location getSpawnLocation() {
+        return spawnLocation != null ? spawnLocation.clone() : null;
     }
 
     public static PvPUP getInstance() {
