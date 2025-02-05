@@ -426,4 +426,10 @@ public class LevelManager {
     public void resetKillstreak(Player player) {
         killstreaks.remove(player.getUniqueId());
     }
+
+    // Añadir este método a la clase LevelManager
+    public int getKillstreak(Player player) {
+        return killstreaks.getOrDefault(player.getUniqueId(), 0);
+    }
+
 }

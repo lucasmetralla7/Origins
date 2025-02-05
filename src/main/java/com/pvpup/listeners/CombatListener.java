@@ -70,6 +70,12 @@ public class CombatListener implements Listener {
         Player victim = event.getEntity();
         Player killer = victim.getKiller();
 
+        // Ocultar mensajes de muerte y pantalla
+        event.setDeathMessage(null);
+        event.setKeepInventory(true);
+        event.setKeepLevel(true);
+        event.getDrops().clear();
+
         // Reset victim's killstreak
         plugin.getLevelManager().resetKillstreak(victim);
 
@@ -90,13 +96,14 @@ public class CombatListener implements Listener {
         // Set death cooldown
         deathCooldowns.put(victim.getUniqueId(), System.currentTimeMillis());
 
-        // Teleportar al spawn inmediatamente después de la muerte
-        Location spawn = plugin.getSpawnLocation();
-        if (spawn != null) {
-            plugin.getServer().getScheduler().runTask(plugin, () -> {
+        // Respawn inmediato sin pantalla de muerte
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            victim.spigot().respawn();
+            Location spawn = plugin.getSpawnLocation();
+            if (spawn != null) {
                 victim.teleport(spawn);
-            });
-        }
+            }
+        });
     }
 
     @EventHandler
@@ -122,8 +129,8 @@ public class CombatListener implements Listener {
         }
 
         // Check if either player is in a safe zone
-        if (plugin.getSafeZoneManager().isInSafeZone(victim.getLocation()) || 
-            plugin.getSafeZoneManager().isInSafeZone(attacker.getLocation())) {
+        if (plugin.getSafeZoneManager().isInSafeZone(victim.getLocation()) ||
+                plugin.getSafeZoneManager().isInSafeZone(attacker.getLocation())) {
             event.setCancelled(true);
             attacker.sendMessage(ChatColor.RED + "No puedes atacar en una zona segura.");
             return;
@@ -173,11 +180,11 @@ public class CombatListener implements Listener {
                 double radius = config.getDouble("death-effects.water-death.particles.radius", 1.0);
 
                 location.getWorld().spawnParticle(
-                    Particle.valueOf(particleType),
-                    location,
-                    count,
-                    radius, radius, radius,
-                    0.1
+                        Particle.valueOf(particleType),
+                        location,
+                        count,
+                        radius, radius, radius,
+                        0.1
                 );
             } catch (IllegalArgumentException e) {
                 plugin.getLogger().warning("Invalid particle type in config: " + e.getMessage());
@@ -192,10 +199,10 @@ public class CombatListener implements Listener {
                 float pitch = (float) config.getDouble("death-effects.water-death.sound.pitch", 1.0);
 
                 location.getWorld().playSound(
-                    location,
-                    Sound.valueOf(soundType),
-                    volume,
-                    pitch
+                        location,
+                        Sound.valueOf(soundType),
+                        volume,
+                        pitch
                 );
             } catch (IllegalArgumentException e) {
                 plugin.getLogger().warning("Invalid sound type in config: " + e.getMessage());

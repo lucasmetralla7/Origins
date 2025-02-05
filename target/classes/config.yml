@@ -271,3 +271,24 @@ killstreaks:
       - effect: DAMAGE_RESISTANCE
         level: 1
         duration: 200
+
+# Scoreboard Configuration
+scoreboard:
+  title: "&6&lPvP UP"
+  lines:
+    - "&7"
+    - "&eNivel: &f%level%"
+    - "&eKills: &f%kills%"
+    - "&7"
+    - "&eNivel Máximo: &f%max_level%"
+    - "&7"
+    - "&aBooster %booster_type%: &fx%booster%"
+  # Variables disponibles:
+  # %level% - Nivel actual del jugador
+  # %kills% - Kills totales del jugador
+  # %max_level% - Nivel máximo alcanzable
+  # %killstreak% - Racha actual de kills
+  # %booster% - Multiplicador de booster activo
+  # %booster_type% - Tipo de booster (VIP/MVP)
+  # %player% - Nombre del jugador
+  # %online% - Jugadores en línea
